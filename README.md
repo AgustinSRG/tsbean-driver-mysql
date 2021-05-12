@@ -1,34 +1,28 @@
-# TSBean-ORM Driver Template
+# TSBean-ORM MySQL Driver
 
-This is a generic template to create a driver for [tsbean-orm](https://github.com/AgustinSRG/tsbean-orm).
+This a MySQL driver for [tsbean-orm](https://github.com/AgustinSRG/tsbean-orm).
 
-Modify `driver.ts` to implement the driver functionalities depending on the data source this driver supports.
+Based on [mysql2](https://www.npmjs.com/package/mysql2) package.
 
 ## Installation
 
 ```
-npm install --save [driver-name-here]
+npm install --save tsbean-driver-mysql
 ```
-
-## Build the project
-
-To compile the driver type:
-
-```
-npm run build
-```
-
-The javascript files are stored in the `dist` folder.
-
-The documentation is stored in the `docs` folder.
 
 ## Usage
 
 ```ts
 import { DataSourceDriver, DataSource } from "tsbean-orm";
-import { TemplateDriver } from "tsbean-driver-template"
+import { MySQLDriver } from "tsbean-driver-mysql"
 
-const mySource = TemplateDriver.createDataSource({} /* Options */);
+const mySource = MySQLDriver.createDataSource({
+    host: "localhost",
+    port: 3306,
+    user: "root",
+    password: "",
+    database: "my_database"
+});
 
 DataSource.set(DataSource.DEFAULT, mySource);
 ```
