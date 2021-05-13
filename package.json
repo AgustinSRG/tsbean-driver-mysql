@@ -1,6 +1,6 @@
 {
   "name": "tsbean-driver-mysql",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "MySQL driver for TSBean-ORM. Works with any database with support for the MySQL protocol.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     "lint"
   ],
   "peerDependencies": {
-    "tsbean-orm": "0.1.1"
+    "tsbean-orm": "1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.2.18",
