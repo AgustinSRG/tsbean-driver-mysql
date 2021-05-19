@@ -3,14 +3,14 @@
 "use strict";
 
 import { GenericFilter } from "tsbean-orm";
-import { replaceLikeWildcards, reverseRegexp, toSnakeCase } from "./utils";
+import { replaceLikeWildcards, reverseRegexp } from "./utils";
 
 /**
  * Parses filter and creates a SQL expression for It
  * @param filter Generic filter
  * @returns The sql query and the list of values
  */
-export function filterToSQL(filter: GenericFilter): { query: string; values: any[] } {
+export function filterToSQL(filter: GenericFilter, idConverter: (id: string) => string): { query: string; values: any[] } {
     let query = "";
     const values = [];
 
@@ -24,7 +24,7 @@ export function filterToSQL(filter: GenericFilter): { query: string; values: any
     case "and":
         first = true;
         for (const subCondition of filter.children) {
-            const child = filterToSQL(subCondition);
+            const child = filterToSQL(subCondition, idConverter);
 
             if (child.query.length > 0) {
 
@@ -44,7 +44,7 @@ export function filterToSQL(filter: GenericFilter): { query: string; values: any
     case "or":
         first = true;
         for (const subCondition of filter.children) {
-            const child = filterToSQL(subCondition);
+            const child = filterToSQL(subCondition, idConverter);
 
             if (child.query.length > 0) {
 
@@ -63,7 +63,7 @@ export function filterToSQL(filter: GenericFilter): { query: string; values: any
         break;
     case "not":
         {
-            const child = filterToSQL(filter.child);
+            const child = filterToSQL(filter.child, idConverter);
 
             if (child.query.length > 0) {
                 query = "NOT( " + child.query + " )";
@@ -80,9 +80,9 @@ export function filterToSQL(filter: GenericFilter): { query: string; values: any
             const rStr = reverseRegexp(val);
 
             if (val.flags.indexOf("i") >= 0) {
-                query += "UPPER(`" + toSnakeCase(field) + "`) LIKE UPPER(?)";
+                query += "UPPER(`" + idConverter(field) + "`) LIKE UPPER(?)";
             } else {
-                query += "`" + toSnakeCase(field) + "` LIKE ?";
+                query += "`" + idConverter(field) + "` LIKE ?";
             }
 
             if (rStr.startsWith("^")) {
@@ -108,7 +108,7 @@ export function filterToSQL(filter: GenericFilter): { query: string; values: any
                 } else {
                     subquery += " OR ";
                 }
-                subquery += "(`" + toSnakeCase(field) + "` = ?)";
+                subquery += "(`" + idConverter(field) + "` = ?)";
                 values.push(v);
             }
             if (subquery.length > 0) {
@@ -118,41 +118,41 @@ export function filterToSQL(filter: GenericFilter): { query: string; values: any
         break;
     case "exists":
         if (filter.exists) {
-            query += "`" + toSnakeCase(filter.key) + "` IS NOT NULL";
+            query += "`" + idConverter(filter.key) + "` IS NOT NULL";
         } else {
-            query += "`" + toSnakeCase(filter.key) + "` IS NULL";
+            query += "`" + idConverter(filter.key) + "` IS NULL";
         }
         break;
     case "eq":
         if (filter.value === null || filter.value === undefined) {
-            query += "`" + toSnakeCase(filter.key) + "` IS NULL";
+            query += "`" + idConverter(filter.key) + "` IS NULL";
         } else {
-            query += "`" + toSnakeCase(filter.key) + "` = ?";
+            query += "`" + idConverter(filter.key) + "` = ?";
             values.push(filter.value);
         }
         break;
     case "ne":
         if (filter.value === null || filter.value === undefined) {
-            query += "`" + toSnakeCase(filter.key) + "` IS NOT NULL";
+            query += "`" + idConverter(filter.key) + "` IS NOT NULL";
         } else {
-            query += "`" + toSnakeCase(filter.key) + "` != ?";
+            query += "`" + idConverter(filter.key) + "` != ?";
             values.push(filter.value);
         }
         break;
     case "gt":
-        query += "`" + toSnakeCase(filter.key) + "` > ?";
+        query += "`" + idConverter(filter.key) + "` > ?";
         values.push(filter.value);
         break;
     case "lt":
-        query += "`" + toSnakeCase(filter.key) + "` < ?";
+        query += "`" + idConverter(filter.key) + "` < ?";
         values.push(filter.value);
         break;
     case "gte":
-        query += "`" + toSnakeCase(filter.key) + "` >= ?";
+        query += "`" + idConverter(filter.key) + "` >= ?";
         values.push(filter.value);
         break;
     case "lte":
-        query += "`" + toSnakeCase(filter.key) + "` <= ?";
+        query += "`" + idConverter(filter.key) + "` <= ?";
         values.push(filter.value);
         break;
     }
