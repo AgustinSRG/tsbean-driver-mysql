@@ -26,7 +26,7 @@ export interface MySQLSourceConfiguration {
     database: string;
     debug?: (msg: string) => void;
     disableIdentifierConversion?: boolean;
-    customIdentifierConversion: NameConversion;
+    customIdentifierConversion?: NameConversion;
 }
 
 /**
