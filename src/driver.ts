@@ -85,8 +85,8 @@ export class MySQLDriver implements DataSourceDriver {
      * @param values The values to replace
      * @returns The results
      */
-    public customQuery(sentence: string, values: any[]): Promise<{ results: any, fileds: any[] }> {
-        return new Promise<{ results: any, fileds: any[] }>(function (resolve, reject) {
+    public customQuery(sentence: string, values: any[]): Promise<{ results: any, fields: any[] }> {
+        return new Promise<{ results: any, fields: any[] }>(function (resolve, reject) {
             this.pool.query(sentence, values, function (error, results, fields) {
                 if (error) {
                     return reject(error);
@@ -336,9 +336,12 @@ export class MySQLDriver implements DataSourceDriver {
         const qm = [];
         let insertReturns = false;
 
-        for (const key of keys) {
-            sqlKeys.push("`" + this.idConversion.toSQL(key) + "`");
-            values.push(toSQLCompatibleValue(row[key]));
+        for (const k of keys) {
+            if (key === k && (row[k] === null || row[k] === undefined)) {
+                continue;
+            }
+            sqlKeys.push("`" + this.idConversion.toSQL(k) + "`");
+            values.push(toSQLCompatibleValue(row[k]));
             qm.push("?");
         }
 
