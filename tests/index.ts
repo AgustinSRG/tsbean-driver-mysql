@@ -230,6 +230,24 @@ describe("MySQL tsbean-orm driver testing", () => {
         expect(results.map(a => a.toObject())).to.be.eql(rows.slice().reverse());
     });
 
+    it("Find (Stream)", async () => {
+        const results = [];
+        await Person.finder.findStream(DataFilter.any(), OrderBy.asc("id"), SelectOptions.default(), async (person: Person) => {
+            results.push(person);
+        });
+
+        expect(results.map(a => a.toObject())).to.be.eql(rows.slice());
+    });
+
+    it("Find (Stream Sync)", async () => {
+        const results = [];
+        await Person.finder.findStreamSync(DataFilter.any(), OrderBy.asc("id"), SelectOptions.default(), async (person: Person) => {
+            results.push(person);
+        });
+
+        expect(results.map(a => a.toObject())).to.be.eql(rows.slice());
+    });
+
     it("Find (EQ)", async () => {
         const results = await Person.finder.find(DataFilter.equals("name", "Aidan"), OrderBy.asc("id"));
 
