@@ -4,7 +4,7 @@
 
 import MySQL from "mysql2";
 import { Readable } from "stream";
-import { DataSourceDriver, DataSource, GenericKeyValue, GenericRow, SortDirection, GenericFilter } from "tsbean-orm";
+import { DataSourceDriver, DataSource, GenericKeyValue, GenericRow, SortDirection, GenericFilter, ExtraFindOptions } from "tsbean-orm";
 import { filterToSQL } from "./filtering";
 import { normalizeSQLResults, toCamelCase, toSnakeCase, toSQLCompatibleValue } from "./utils";
 
@@ -120,7 +120,7 @@ export class MySQLDriver implements DataSourceDriver {
         }.bind(this));
     }
 
-    private generateSelectSentence(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>): { sql: string, values: any[] } {
+    private generateSelectSentence(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, extraOptions: ExtraFindOptions): { sql: string, values: any[] } {
         let sentence = "SELECT ";
         const values = [];
 
@@ -138,6 +138,10 @@ export class MySQLDriver implements DataSourceDriver {
         }
 
         sentence += " FROM `" + table + "`";
+
+        if (extraOptions && extraOptions.useIndex) {
+            sentence += " FORCE INDEX (`" + extraOptions.useIndex + "`)";
+        }
 
         const cond1 = filterToSQL(filter, this.idConversion.toSQL);
 
@@ -174,9 +178,10 @@ export class MySQLDriver implements DataSourceDriver {
      * @param skip Number of rows to skip. Leave as -1 for no skip
      * @param limit Limit of results. Leave as -1 for no limit
      * @param projection List of fields to featch from the table. Leave as null to fetch them all.
+     * @param extraOptions Extra find options
      */
-    find(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>): Promise<GenericRow[]> {
-        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection);
+    find(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, extraOptions?: ExtraFindOptions): Promise<GenericRow[]> {
+        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection, extraOptions);
         const sentence = sentenceAndValues.sql;
         const values = sentenceAndValues.values;
 
@@ -198,9 +203,15 @@ export class MySQLDriver implements DataSourceDriver {
      * Counts the number of rows matching a condition
      * @param table Table or collection name
      * @param filter Filter to apply
+     * @param extraOptions Extra find options
      */
-    count(table: string, filter: GenericFilter): Promise<number> {
+    count(table: string, filter: GenericFilter, extraOptions?: ExtraFindOptions): Promise<number> {
         let sentence = "SELECT COUNT(*) AS `count` FROM `" + table + "`";
+
+        if (extraOptions && extraOptions.useIndex) {
+            sentence += " FORCE INDEX (`" + extraOptions.useIndex + "`)";
+        }
+
         const values = [];
         const cond1 = filterToSQL(filter, this.idConversion.toSQL);
 
@@ -237,9 +248,10 @@ export class MySQLDriver implements DataSourceDriver {
      * @param limit Limit of results. Leave as -1 for no limit
      * @param projection List of fields to featch from the table. Leave as null to fetch them all.
      * @param each Function to parse each row
+     * @param extraOptions Extra find options
      */
-    findStream(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, each: (row: GenericRow) => Promise<void>): Promise<void> {
-        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection);
+    findStream(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, each: (row: GenericRow) => Promise<void>, extraOptions?: ExtraFindOptions): Promise<void> {
+        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection, extraOptions);
         const sentence = sentenceAndValues.sql;
         const values = sentenceAndValues.values;
 
@@ -293,9 +305,10 @@ export class MySQLDriver implements DataSourceDriver {
      * @param limit Limit of results. Leave as -1 for no limit
      * @param projection List of fields to featch from the table. Leave as null to fetch them all.
      * @param each Function to parse each row
+     * @param extraOptions Extra find options
      */
-    findStreamSync(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, each: (row: any) => void): Promise<void> {
-        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection);
+    findStreamSync(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, each: (row: any) => void, extraOptions?: ExtraFindOptions): Promise<void> {
+        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection, extraOptions);
         const sentence = sentenceAndValues.sql;
         const values = sentenceAndValues.values;
 
