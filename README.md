@@ -31,7 +31,7 @@ DataSource.set(DataSource.DEFAULT, mySource);
 
 ## Correspondence of identifiers
 
-This driver from [camel case](https://es.wikipedia.org/wiki/Camel_case) to [snake case](https://en.wikipedia.org/wiki/Snake_case). By default, we expect all the database table and column identifiers in snake case. Those identifiers will be converted to camel case before passing to tsbean, so you can work with camel case identifiers in your code.
+This driver maps from [camel case](https://es.wikipedia.org/wiki/Camel_case) to [snake case](https://en.wikipedia.org/wiki/Snake_case). By default, we expect all the database table and column identifiers in snake case. Those identifiers will be converted to camel case before passing to tsbean, so you can work with camel case identifiers in your code.
 
 Here is an example:
 
