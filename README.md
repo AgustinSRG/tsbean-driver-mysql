@@ -1,9 +1,6 @@
 # TSBean-ORM MySQL Driver
 
 [![npm version](https://badge.fury.io/js/tsbean-driver-mysql.svg)](https://badge.fury.io/js/tsbean-driver-mysql)
-[![Dependency Status](https://david-dm.org/AgustinSRG/tsbean-driver-mysql.svg)](https://david-dm.org/AgustinSRG/tsbean-driver-mysql)
-[![devDependency Status](https://david-dm.org/AgustinSRG/tsbean-driver-mysql/dev-status.svg)](https://david-dm.org/AgustinSRG/tsbean-driver-mysql?type=dev)
-[![peerDependency Status](https://david-dm.org/AgustinSRG/tsbean-driver-mysql/peer-status.svg)](https://david-dm.org/AgustinSRG/tsbean-driver-mysql?type=peer)
 
 This a MySQL driver for [tsbean-orm](https://github.com/AgustinSRG/tsbean-orm).
 
