@@ -4,7 +4,7 @@
 
 import MySQL from "mysql2";
 import { Readable } from "stream";
-import { DataSourceDriver, DataSource, GenericKeyValue, GenericRow, SortDirection, GenericFilter } from "tsbean-orm";
+import { DataSourceDriver, DataSource, GenericKeyValue, GenericRow, SortDirection, GenericFilter, GenericRowUpdate } from "tsbean-orm";
 import { filterToSQL } from "./filtering";
 import { normalizeSQLResults, toCamelCase, toSnakeCase, toSQLCompatibleValue } from "./utils";
 
@@ -469,7 +469,7 @@ export class MySQLDriver implements DataSourceDriver {
      * @param updated Updated row
      * @returns The number of affected rows
      */
-    updateMany(table: string, filter: GenericFilter, updated: GenericRow): Promise<number> {
+    updateMany(table: string, filter: GenericFilter, updated: GenericRowUpdate): Promise<number> {
         const keys = Object.keys(updated);
 
         if (keys.length === 0) {
@@ -487,8 +487,21 @@ export class MySQLDriver implements DataSourceDriver {
                 sentence += ", ";
             }
 
-            sentence += "`" + this.idConversion.toSQL(key) + "` = ?";
-            values.push(toSQLCompatibleValue(updated[key]));
+            if (typeof updated[key] === "object" && updated[key] !== null) {
+                if (updated[key].update === "set") {
+                    sentence += "`" + this.idConversion.toSQL(key) + "` = ?";
+                    values.push(toSQLCompatibleValue(updated[key].value));
+                } else if (updated[key].update === "inc") {
+                    sentence += "`" + this.idConversion.toSQL(key) + "` = `" + this.idConversion.toSQL(key) + "` + ?";
+                    values.push(toSQLCompatibleValue(updated[key].value));
+                } else {
+                    sentence += "`" + this.idConversion.toSQL(key) + "` = ?";
+                    values.push(toSQLCompatibleValue(updated[key]));
+                }
+            } else {
+                sentence += "`" + this.idConversion.toSQL(key) + "` = ?";
+                values.push(toSQLCompatibleValue(updated[key]));
+            }
         }
 
         const cond1 = filterToSQL(filter, this.idConversion.toSQL);
