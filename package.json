@@ -14,7 +14,7 @@
     "compile": "tsc --pretty --declaration",
     "build": "rimraf dist && npm run compile",
     "lint": "eslint --fix src/**/*.ts",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha --bail --exit -r ts-node/register 'tests/**/*.ts'",
     "gendoc": "typedoc --out docs ./src"
   },
   "files": [
@@ -35,12 +35,12 @@
     "tsbean-orm": "2.0.2"
   },
   "devDependencies": {
-    "@types/chai": "4.3.14",
+    "@types/chai": "4.3.6",
     "@types/mocha": "10.0.6",
     "@types/node": "20.12.7",
     "@typescript-eslint/eslint-plugin": "7.6.0",
     "@typescript-eslint/parser": "7.6.0",
-    "chai": "5.1.0",
+    "chai": "4.3.8",
     "eslint": "8.56.0",
     "mocha": "10.4.0",
     "rimraf": "5.0.5",
