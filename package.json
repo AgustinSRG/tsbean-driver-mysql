@@ -1,6 +1,6 @@
 {
   "name": "tsbean-driver-mysql",
-  "version": "1.2.0-beta.1",
+  "version": "1.2.0-beta.2",
   "description": "MySQL driver for TSBean-ORM. Works with any database with support for the MySQL protocol.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -35,22 +35,22 @@
     "tsbean-orm": "1.1.0-beta.1"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.21",
-    "@types/mocha": "^8.2.3",
-    "@types/node": "^16.3.2",
-    "@typescript-eslint/eslint-plugin": "^4.28.3",
-    "@typescript-eslint/parser": "^4.28.3",
-    "chai": "^4.3.4",
-    "eslint": "^7.30.0",
-    "mocha": "^9.0.2",
-    "rimraf": "^3.0.2",
-    "ts-node": "^10.1.0",
-    "typedoc": "^0.21.4",
-    "typescript": "^4.3.5"
+    "@types/chai": "4.3.6",
+    "@types/mocha": "10.0.6",
+    "@types/node": "20.12.7",
+    "@typescript-eslint/eslint-plugin": "7.6.0",
+    "@typescript-eslint/parser": "7.6.0",
+    "chai": "4.3.8",
+    "eslint": "8.56.0",
+    "mocha": "10.4.0",
+    "rimraf": "5.0.5",
+    "ts-node": "10.9.2",
+    "typedoc": "0.25.13",
+    "typescript": "5.4.5"
   },
   "license": "MIT",
   "dependencies": {
-    "mysql2": "2.2.5",
+    "mysql2": "3.9.7",
     "tsbean-orm": "1.1.0-beta.1"
   }
 }
