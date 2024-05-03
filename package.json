@@ -1,6 +1,6 @@
 {
   "name": "tsbean-driver-mysql",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "MySQL driver for TSBean-ORM. Works with any database with support for the MySQL protocol.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
