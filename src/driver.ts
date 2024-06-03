@@ -4,7 +4,7 @@
 
 import MySQL from "mysql2";
 import { Readable } from "stream";
-import { DataSourceDriver, DataSource, GenericKeyValue, GenericRow, SortDirection, GenericFilter, GenericRowUpdate } from "tsbean-orm";
+import { DataSourceDriver, DataSource, GenericKeyValue, GenericRow, SortDirection, GenericFilter, GenericRowUpdate, QueryExtraOptions } from "tsbean-orm";
 import { filterToSQL } from "./filtering";
 import { normalizeSQLResults, toCamelCase, toSnakeCase, toSQLCompatibleValue } from "./utils";
 
@@ -120,7 +120,7 @@ export class MySQLDriver implements DataSourceDriver {
         }.bind(this));
     }
 
-    private generateSelectSentence(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>): { sql: string, values: any[] } {
+    private generateSelectSentence(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, queryExtraOptions: QueryExtraOptions): { sql: string, values: any[] } {
         let sentence = "SELECT ";
         const values = [];
 
@@ -138,6 +138,10 @@ export class MySQLDriver implements DataSourceDriver {
         }
 
         sentence += " FROM `" + table + "`";
+
+        if (queryExtraOptions && queryExtraOptions.indexName) {
+            sentence += " FORCE INDEX (`" + queryExtraOptions.indexName + "`)";
+        }
 
         const cond1 = filterToSQL(filter, this.idConversion.toSQL);
 
@@ -173,10 +177,12 @@ export class MySQLDriver implements DataSourceDriver {
      * @param sortDir "asc" or "desc". Leave as null for default sorting
      * @param skip Number of rows to skip. Leave as -1 for no skip
      * @param limit Limit of results. Leave as -1 for no limit
-     * @param projection List of fields to featch from the table. Leave as null to fetch them all.
+     * @param queryExtraOptions Additional query options
+     * @param projection List of fields to fetch from the table. Leave as null to fetch them all.
+     * @param queryExtraOptions Additional query options
      */
-    find(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>): Promise<GenericRow[]> {
-        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection);
+    find(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, queryExtraOptions: QueryExtraOptions): Promise<GenericRow[]> {
+        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection, queryExtraOptions);
         const sentence = sentenceAndValues.sql;
         const values = sentenceAndValues.values;
 
@@ -198,9 +204,15 @@ export class MySQLDriver implements DataSourceDriver {
      * Counts the number of rows matching a condition
      * @param table Table or collection name
      * @param filter Filter to apply
+     * @param queryExtraOptions Additional query options
      */
-    count(table: string, filter: GenericFilter): Promise<number> {
+    count(table: string, filter: GenericFilter, queryExtraOptions: QueryExtraOptions): Promise<number> {
         let sentence = "SELECT COUNT(*) AS `count` FROM `" + table + "`";
+
+        if (queryExtraOptions && queryExtraOptions.indexName) {
+            sentence += " FORCE INDEX (`" + queryExtraOptions.indexName + "`)";
+        }
+
         const values = [];
         const cond1 = filterToSQL(filter, this.idConversion.toSQL);
 
@@ -235,11 +247,11 @@ export class MySQLDriver implements DataSourceDriver {
      * @param sortDir "asc" or "desc". Leave as null for default sorting
      * @param skip Number of rows to skip. Leave as -1 for no skip
      * @param limit Limit of results. Leave as -1 for no limit
-     * @param projection List of fields to featch from the table. Leave as null to fetch them all.
+     * @param projection List of fields to fetch from the table. Leave as null to fetch them all.
      * @param each Function to parse each row
      */
-    findStream(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, each: (row: GenericRow) => Promise<void>): Promise<void> {
-        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection);
+    findStream(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, queryExtraOptions: QueryExtraOptions, each: (row: GenericRow) => Promise<void>): Promise<void> {
+        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection, queryExtraOptions);
         const sentence = sentenceAndValues.sql;
         const values = sentenceAndValues.values;
 
@@ -291,11 +303,12 @@ export class MySQLDriver implements DataSourceDriver {
      * @param sortDir "asc" or "desc". Leave as null for default sorting
      * @param skip Number of rows to skip. Leave as -1 for no skip
      * @param limit Limit of results. Leave as -1 for no limit
-     * @param projection List of fields to featch from the table. Leave as null to fetch them all.
+     * @param projection List of fields to fetch from the table. Leave as null to fetch them all.
+     * @param queryExtraOptions Additional query options
      * @param each Function to parse each row
      */
-    findStreamSync(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, each: (row: any) => void): Promise<void> {
-        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection);
+    findStreamSync(table: string, filter: GenericFilter, sortBy: string, sortDir: SortDirection, skip: number, limit: number, projection: Set<string>, queryExtraOptions: QueryExtraOptions, each: (row: any) => void): Promise<void> {
+        const sentenceAndValues = this.generateSelectSentence(table, filter, sortBy, sortDir, skip, limit, projection, queryExtraOptions);
         const sentence = sentenceAndValues.sql;
         const values = sentenceAndValues.values;
 
