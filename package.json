@@ -7,7 +7,7 @@
   "homepage": "https://github.com/AgustinSRG/tsbean-driver-mysql",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AgustinSRG/tsbean-driver-mysql"
+    "url": "git+https://github.com/AgustinSRG/tsbean-driver-mysql.git"
   },
   "scripts": {
     "prebuild": "npm run lint",
