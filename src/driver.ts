@@ -598,7 +598,7 @@ export class MySQLDriver implements DataSourceDriver {
      * @param field Name of the field to aggregate
      */
     sum(table: string, filter: GenericFilter, id: string, field: string): Promise<number> {
-        let sentence = "SELECT SUM(`" + this.idConversion.toSQL(field) + "`) AS `" + this.idConversion.toSQL(field) + "` FROM `" + table + "`";
+        let sentence = "SELECT SUM(`" + this.idConversion.toSQL(field) + "`) AS `sum_res` FROM `" + table + "`";
         const values = [];
 
         const cond1 = filterToSQL(filter, this.idConversion.toSQL);
@@ -613,13 +613,12 @@ export class MySQLDriver implements DataSourceDriver {
         this.debug("[MYSQL] " + MySQL.format(sentence, values));
 
         return new Promise<number>(function (resolve, reject) {
-            this.pool.query(sentence, values, function (error, results, fields) {
+            this.pool.query(sentence, values, function (error, results) {
                 if (error) {
                     return reject(error);
                 }
-                const normalized = this.idConversion.parseResults(results);
-                if (normalized && normalized.length) {
-                    resolve(parseInt(normalized[0][field], 10) || 0);
+                if (results && results.length) {
+                    resolve(parseInt(results[0]["sum_res"], 10) || 0);
                 } else {
                     resolve(0);
                 }
