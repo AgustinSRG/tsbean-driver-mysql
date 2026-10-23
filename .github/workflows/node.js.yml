@@ -25,6 +25,7 @@ jobs:
       uses: getong/mariadb-action@v1.11
       with:
         mysql database: 'tsbean_driver_test'
+        mysql root password: '1234'
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v6
       with:
